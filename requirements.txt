@@ -1,0 +1,4 @@
+arrow==0.*
+knackpy==1.0.*
+requests
+sodapy==2.1.*
