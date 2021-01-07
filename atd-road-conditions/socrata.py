@@ -22,22 +22,15 @@ SOCRATA_API_KEY_ID = os.getenv("SOCRATA_API_KEY_ID")
 SOCRATA_API_KEY_SECRET = os.getenv("SOCRATA_API_KEY_SECRET")
 
 
-def get_logger(name, level=logging.ERROR):
-    """Return a module logger that streams to stdout and to rotating file"""
+def get_logger(name):
+    """Return a module logger that streams to stdout. Writing to a log file will break
+    Airflow!"""
     logger = logging.getLogger(name)
-    formatter = logging.Formatter(fmt="%(asctime)s %(levelname)s: %(message)s")
-
-    handler_stream = logging.StreamHandler(stream=sys.stdout)
-    handler_stream.setFormatter(formatter)
-    logger.addHandler(handler_stream)
-
-    handler_file = logging.handlers.RotatingFileHandler(
-        "log/scraper.log", maxBytes=1000000, backupCount=5
-    )
-    handler_file.setFormatter(formatter)
-    logger.addHandler(handler_file)
-
-    logger.setLevel(level)
+    handler = logging.StreamHandler(stream=sys.stdout)
+    formatter = logging.Formatter(fmt=" %(name)s.%(levelname)s: %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.DEBUG)
     return logger
 
 
@@ -50,6 +43,7 @@ def cli_args():
         required=False,
         help="An ISO 8601-compliant date string which will be used to query records",
     )
+
     return parser.parse_args()
 
 
