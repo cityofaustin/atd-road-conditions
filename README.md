@@ -30,7 +30,7 @@ This script supports a `--date` argument which expects an ISO date string that w
 
 ## Deployment
 
-These scripts are designed to be containerized within the included `Dockerfile`.
+These scripts are designed to be containerized within the included `Dockerfile`. Any push to the `production` branch will cause a new docker image to be built and pushed to Dockerhub with tags `production`, `latest`, and `staging`. (We tag with `staging` because our Airflow instance pulls images with the `staging` tag).
 
 `scape.py` is deployed on our primary Linux server. A `cron` task fires `bash_scripts/manage_container.sh` every minute to make sure the scraper container exists and is running.
 
