@@ -25,9 +25,9 @@ jobs:
         with:
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/atd-knack-services:production
-            ${{ secrets.DOCKER_USERNAME }}/atd-knack-services:staging
-            ${{ secrets.DOCKER_USERNAME }}/atd-knack-services:latest
+            ${{ secrets.DOCKER_USERNAME }}/atd-road-conditions:production
+            ${{ secrets.DOCKER_USERNAME }}/atd-road-conditions:staging
+            ${{ secrets.DOCKER_USERNAME }}/atd-road-conditions:latest
       -
         name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
