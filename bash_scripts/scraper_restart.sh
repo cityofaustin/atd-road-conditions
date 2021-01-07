@@ -1,7 +1,7 @@
 #!/bin/bash
 # restart scraper to allow it to fetch any new sensor records that may have bene created
 # run this nightly
-if [ ! "$(sudo docker ps | grep road-conditions)" ]; then
+if [ "$(sudo docker ps | grep road-conditions)" ]; then
     # restart container if it exists
     sudo docker restart "road-conditions"
 else
