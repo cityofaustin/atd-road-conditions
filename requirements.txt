@@ -1,4 +1,4 @@
-arrow==0.*
+arrow==1.2.*
 knackpy==1.0.*
-requests
+aiohttp==3.7.*
 sodapy==2.1.*
