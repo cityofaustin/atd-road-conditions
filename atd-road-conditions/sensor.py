@@ -84,5 +84,6 @@ class Sensor(object):
         async with self.session.post(
             PGREST_ENDPOINT, headers=self.postgrest_headers, json=self.data
         ) as response:
+            breakpoint()
             response.raise_for_status()
             return
