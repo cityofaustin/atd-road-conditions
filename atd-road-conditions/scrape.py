@@ -22,7 +22,7 @@ from settings import TIMEOUT, SLEEP_INTERVAL, LOG_DIR
 
 from random import randrange
 
-KNACK_OBJECT = "object_190"
+KNACK_VIEW = "view_3088"
 
 KNACK_RECORD_FILTERS = {
     "match": "and",
@@ -41,16 +41,28 @@ KNACK_APP_ID = os.getenv("KNACK_APP_ID")
 def get_sensor_records():
     logger.debug("Getting sensors from Knack...")
     app = knackpy.App(app_id=KNACK_APP_ID, api_key=KNACK_API_KEY)
-    return app.get(KNACK_OBJECT, filters=KNACK_RECORD_FILTERS)
+    return app.get(KNACK_VIEW, filters=KNACK_RECORD_FILTERS)
 
 
 def create_sensor(record, session):
     ip = record.get("field_3595")
     sensor_id = record.get("field_3598")
-    if not ip and sensor_id:
+    lon = record.get("field_182", {}).get("longitude")
+    lat = record.get("field_182", {}).get("latitude")
+    location_name = record.get("field_211").strip()
+
+    if not (ip and sensor_id and lon and lat and location_name):
         logger.warning("Unable to create sensor due to missing data")
         return None
-    return Sensor(ip=ip, sensor_id=sensor_id, session=session)
+
+    return Sensor(
+        ip=ip,
+        sensor_id=sensor_id,
+        session=session,
+        lat=lat,
+        lon=lon,
+        location_name=location_name,
+    )
 
 
 async def sensor_task(sensor):
@@ -60,9 +72,7 @@ async def sensor_task(sensor):
         except asyncio.exceptions.TimeoutError:
             logger.error(f"{sensor}: TimeoutError")
         except Exception as e:
-            logger.error(
-                f"{sensor}: {str(e.__class__)}"
-            )
+            logger.error(f"{sensor}: {str(e.__class__)}")
             pass
 
         if sensor.data:
@@ -71,9 +81,7 @@ async def sensor_task(sensor):
             except asyncio.exceptions.TimeoutError:
                 logger.error(f"{sensor}: TimeoutError")
             except Exception as e:
-                logger.error(
-                    f"{sensor}: {str(e.__class__)}"
-                )
+                logger.error(f"{sensor}: {str(e.__class__)}")
                 pass
 
         logger.debug(f"{sensor}: sleeping for {SLEEP_INTERVAL} seconds")

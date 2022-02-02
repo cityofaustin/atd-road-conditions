@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-docker run --network host -it --rm --env-file env_file -v /Users/john/Dropbox/atd/atd-road-conditions:/app atddocker/atd-road-conditions atd-road-conditions/socrata.py
-"""
+""" Publish weather sensor records to Socrata (data.austintexas.gov) """
 import argparse
 from datetime import datetime
 import logging
@@ -50,12 +48,20 @@ def cli_args():
 def handle_date_filter(date_filter, rollback_seconds=300):
     """Rollback date filter to 5 minutes earlier. Just being careful to avoid
     a situation where records created in the DB are missed due to lag time from this
-    job or the scraper publishing job. """
+    job or the scraper publishing job."""
     if not date_filter:
         return None
     timestamp = int(datetime.fromisoformat(date_filter).timestamp())
     timestamp = timestamp - rollback_seconds
     return datetime.fromtimestamp(timestamp).isoformat()
+
+
+def format_point(lon, lat):
+    """Return a socrata-friendly Point object"""
+    return {
+        "type": "Point",
+        "coordinates": [lon, lat],
+    }
 
 
 def fetch_data(date_filter):
@@ -66,7 +72,7 @@ def fetch_data(date_filter):
         "Authorization": f"Bearer {PGREST_JWT}",
     }
 
-    params = {"offset": 0}
+    params = {"order": "timestamp.asc", "offset": 0}
 
     if date_filter:
         params["timestamp"] = f"gte.{date_filter}"
@@ -96,13 +102,22 @@ def chunks(lst, n):
 
 def localize_timestamps(data, key="timestamp", tz="US/Central"):
     """Convert UTC timestamps to local time, and remove timezone attribute from
-    ISO string, because socrata doesn't support it """
+    ISO string, because socrata doesn't support it"""
     tzinfo = arrow.now(tz).tzinfo
     for row in data:
         dt = arrow.get(row[key])
         dt_local = dt.astimezone(tzinfo)
         row[key] = arrow.get(dt_local).format("YYYY-MM-DDTHH:mm:ss")
     return None
+
+
+def handle_locations(data):
+    for row in data:
+        lon = row.pop("lon", None)
+        lat = row.pop("lat", None)
+        if not (lat and lon):
+            continue
+        row["location"] = format_point(lon, lat)
 
 
 def main():
@@ -115,6 +130,8 @@ def main():
     data = fetch_data(date_filter)
 
     localize_timestamps(data)
+
+    handle_locations(data)
 
     client = sodapy.Socrata(
         "data.austintexas.gov",
