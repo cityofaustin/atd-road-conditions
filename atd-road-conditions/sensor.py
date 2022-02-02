@@ -20,15 +20,21 @@ class Sensor(object):
         ip (str): The sensor's IP address
         sensor_id (int): The sensor's unique ID #
         session (aiohttp.ClientSession): an aiohttp session instance
+        lat (float): the sensor's latitude coordinate in WSG84
+        lon (float): the sensor's longitude coordinate in WGS84
+        location_name (str): a descriptive name of the sensor's phyiscal location
     """
 
     def __repr__(self):
         return f"<Sensor id='{self.sensor_id}' ip='{self.ip}'>"
 
-    def __init__(self, *, ip, sensor_id, session):
+    def __init__(self, *, ip, sensor_id, session, lat, lon, location_name):
         self.ip = ip
         self.sensor_id = sensor_id
         self.session = session
+        self.lat = lat
+        self.lon = lon
+        self.location_name = location_name
         self.url = f"http://{self.ip}/data.zhtml"
         self.columns = COLUMNS
         self.postgrest_headers = {
@@ -61,9 +67,15 @@ class Sensor(object):
             # not sure if a sensor would ever return an empty string, but here's
             # handling that case
             return None
-        # there's a period at the end of the data string :/
-        data.append(self.sensor_id)
-        data.append(self.fetch_timestamp)
+        data.extend(
+            [
+                self.sensor_id,
+                self.fetch_timestamp,
+                self.lat,
+                self.lon,
+                self.location_name,
+            ]
+        )
         return dict(zip(self.columns, data))
 
     async def upload(self):

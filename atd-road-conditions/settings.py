@@ -25,4 +25,7 @@ COLUMNS = [
     "status_code",
     "sensor_id",
     "timestamp",
+    "lat",
+    "lon",
+    "location_name",
 ]
