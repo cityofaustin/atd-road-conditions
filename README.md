@@ -55,3 +55,10 @@ When developing locally, you'll likely want to mount your local copy of the repo
 ```
 $ docker run --network host -it --rm --env-file env_file -v /my/path/to/atd-road-conditions:/app atddocker/atd-road-conditions atd-road-conditions/scrape.py
 ```
+
+When deploying, you can start the container initially with this command:
+
+```
+docker run --network host --name road-conditions --env-file env_file -v /srv/publisher/atd-road-conditions:/app atddocker/atd-road-conditions atd-road-conditions/scrape.py
+```
+
