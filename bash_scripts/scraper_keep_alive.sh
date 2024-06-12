@@ -1,8 +1,8 @@
 #!/bin/bash
-if [ ! "$(sudo docker ps -a | grep road-conditions)" ]; then
+if [ ! "$(docker ps -a | grep road-conditions)" ]; then
     # container doesn't exist; create and run it
-    sudo docker run --name road-conditions --network host -d --env-file /srv/publisher/atd-road-conditions/env_file -v /srv/publisher/atd-road-conditions:/app atddocker/atd-road-conditions atd-road-conditions/scrape.py
-elif [ ! "$(sudo docker ps | grep road-conditions)" ]; then
+    docker run --name road-conditions --network host -d --env-file /srv/publisher/atd-road-conditions/env_file -v /srv/publisher/atd-road-conditions:/app atddocker/atd-road-conditions atd-road-conditions/scrape.py
+elif [ ! "$(docker ps | grep road-conditions)" ]; then
     # container exists but is not running; restart it
-    sudo docker restart "road-conditions"
+    docker restart "road-conditions"
 fi
