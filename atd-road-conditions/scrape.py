@@ -5,7 +5,7 @@
 3. Tasks run async an on infinite loop, causing each sensor to fetch data from the
 sensor's data enpoint and uploads the data to a PostgREST endpoint
 
-docker run --network host -it --rm --env-file env_file -v /home/publisher/atd-road-conditions:/app atddocker/atd-road-conditions atd-road-conditions/scrape.py
+docker run --network host -it --rm --env-file env_file -v /srv/publisher/atd-road-conditions:/app atddocker/atd-road-conditions atd-road-conditions/scrape.py
 """
 import asyncio
 import logging
