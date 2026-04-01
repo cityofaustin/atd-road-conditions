@@ -3,7 +3,7 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [production]
+    # branches: [production]
 
 jobs:
   build-image-and-push:
@@ -27,13 +27,12 @@ jobs:
       -
         name: Build and push
         id: docker_build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/atd-road-conditions:production
-            ${{ secrets.DOCKER_USERNAME }}/atd-road-conditions:staging
+
             ${{ secrets.DOCKER_USERNAME }}/atd-road-conditions:latest
       -
         name: Image digest
