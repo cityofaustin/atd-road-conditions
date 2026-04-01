@@ -6,7 +6,7 @@ on:
     # branches: [production]
 
 jobs:
-  main:
+  build-image-and-push:
     runs-on: ubuntu-latest
     steps:
       -
